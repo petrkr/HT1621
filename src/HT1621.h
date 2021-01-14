@@ -59,6 +59,7 @@ public:
 	void setBatteryLevel(int level);
 	void print(long num, char* flags="%6li", int precision = 0);
 	void print(double num, int precision = 3);
+	void print(char* str, bool leftPadded = false);
 	void display();
 	void noDisplay();
 private:
@@ -77,5 +78,6 @@ private:
 	void setdecimalseparator(int dpposition);
 	void config(); // legacy: why not in begin func
 	void update();
+	char charToSegBits(char character);
 };
 #endif

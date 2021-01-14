@@ -215,47 +215,9 @@ void HT1621::print(long num, char*flags, int precision){
 
 	for(int i=0; i<6; i++){
 		_buffer[i] &= 0x80; // mask the first bit, used by batter and decimal point
-		switch(localbuffer[i]){ // map the digits to the seg bits
-			case '0':
-				_buffer[i] |= 0x7D;
-				break;
-			case '1':
-				_buffer[i] |= 0x60;
-				break;
-			case '2':
-				_buffer[i] |= 0x3e;
-				break;
-			case '3':
-				_buffer[i] |= 0x7a;
-				break;
-			case '4':
-				_buffer[i] |= 0x63;
-				break;
-			case '5':
-				_buffer[i] |= 0x5b;
-				break;
-			case '6':
-				_buffer[i] |= 0x5f;
-				break;
-			case '7':
-				_buffer[i] |= 0x70;
-				break;
-			case '8':
-				_buffer[i] |= 0x7f;
-				break;
-			case '9':
-				_buffer[i] |= 0x7b;
-				break;
-			case '-':
-				_buffer[i] |= 0x02;
-				break;
-			default: // do nothing, blank digit!
-				break;
-			}
-		}
-
-		update();
-
+		_buffer[i] |= charToSegBits(localbuffer[i]);
+	}
+	update();
 }
 
 void HT1621::print(double num, int precision){
@@ -286,6 +248,19 @@ void HT1621::print(double num, int precision){
 	update();
 }
 
+void HT1621::print(char* str, bool leftPadded){
+	int chars = strlen(str);
+	int padding = 6 - chars;
+
+	for(int i = 0; i < 6; i++){
+		_buffer[i] &= 0x80; // mask the first bit, used by batter and decimal point
+		char character = leftPadded
+				 		 ? i < padding ? ' ' : str[i - padding]
+				 		 : i >= chars ? ' ' : str[i];
+		_buffer[i] |= charToSegBits(character);
+	}
+
+	setdecimalseparator(0); // Hide decimal point
 	update();
 }
 
@@ -305,4 +280,94 @@ void HT1621::setdecimalseparator(int decimaldigits) {
 	_buffer[6-decimaldigits] |= 0x80;
 }
 
+char HT1621::charToSegBits(char character) {
+	switch (character) {
+	case '*': // For degree for now
+		return 0b0110011;
+	case '|':
+		return 0b0000101;
+	case '-':
+		return 0b0000010;
+	case '_':
+		return 0b0001000;
+	case '0':
+		return 0b1111101;
+	case '1':
+		return 0b1100000;
+	case '2':
+		return 0b111110;
+	case '3':
+		return 0b1111010;
+	case '4':
+		return 0b1100011;
+	case '5':
+		return 0b1011011;
+	case '6':
+		return 0b1011111;
+	case '7':
+		return 0b1110000;
+	case '8':
+		return 0b1111111;
+	case '9':
+		return 0b1111011;
+	case 'A':
+		return 0b1110111;
+	case 'b':
+		return 0b1001111;
+	case 'c':
+		return 0b0001110;
+	case 'C':
+		return 0b0011101;
+	case 'd':
+		return 0b1101110;
+	case 'e':
+		return 0b0001110;
+	case 'E':
+		return 0b0011111;
+	case 'f':
+		return 0b0000111;
+	case 'F':
+		return 0b0010111;
+	case 'G':
+		return 0b1011111;
+	case 'h':
+		return 0b1000111;
+	case 'H':
+		return 0b1100111;
+	case 'i':
+		return 0b1000000;
+	case 'I':
+		return 0b1100000;
+	case 'J':
+		return 0b1101000;
+	case 'l':
+		return 0b1100000;
+	case 'L':
+		return 0b0001101;
+	case 'M':
+		return 0b1110101;
+	case 'n':
+		return 0b1000110;
+	case 'o':
+		return 0b1001110;
+	case 'O':
+		return 0b1111101;
+	case 'P':
+		return 0b0110111;
+	case 'r':
+		return 0b0000110;
+	case 'S':
+		return 0b1011011;
+	case 't':
+		return 0b0001111;
+	case 'u':
+		return 0b1001100;
+	case 'U':
+		return 0b1101101;
+	case 'Y':
+		return 0b1101011;
+	case ' ':
+	default:
+		return 0b0000000;
 	}
+}
