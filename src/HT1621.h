@@ -29,7 +29,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 *******************************************************************************/
 
-#ifndef  HT1621_H_
+#ifndef HT1621_H_
 #define HT1621_H_   //防止重复包含
 
 #define  BIAS     0x52             //0b1000 0101 0010  1/3duty 4com
@@ -51,13 +51,13 @@ class  HT1621
 {
 public:
 	HT1621();
-	void begin(int cs_p, int wr_p, int data_p,int backlight_p);
+	void begin(int cs_p, int wr_p, int data_p, int backlight_p);
 	void begin(int cs_p, int wr_p, int data_p);
 	void clear();
 	void backlight();
 	void noBacklight();
 	void setBatteryLevel(int level);
-	void print(long num, char*flags="%6li", int precision = 0);
+	void print(long num, char* flags="%6li", int precision = 0);
 	void print(double num, int precision = 3);
 	void display();
 	void noDisplay();

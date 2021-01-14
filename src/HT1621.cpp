@@ -33,16 +33,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "HT1621.h"
 
 HT1621::HT1621(){
-		_buffer[0] = 0x00;
-		_buffer[1] = 0x00;
-		_buffer[2] = 0x00;
-		_buffer[3] = 0x00;
-		_buffer[4] = 0x00;
-		_buffer[5] = 0x00;
-		_buffer[6] = 0x00;
+	_buffer[0] = 0x00;
+	_buffer[1] = 0x00;
+	_buffer[2] = 0x00;
+	_buffer[3] = 0x00;
+	_buffer[4] = 0x00;
+	_buffer[5] = 0x00;
+	_buffer[6] = 0x00;
 }
 
-void HT1621::begin(int cs_p,int wr_p,int data_p,int backlight_p)
+void HT1621::begin(int cs_p, int wr_p, int data_p, int backlight_p)
 {
 	pinMode(cs_p, OUTPUT);
 	pinMode(wr_p, OUTPUT);
@@ -54,10 +54,9 @@ void HT1621::begin(int cs_p,int wr_p,int data_p,int backlight_p)
 	_backlight_p=backlight_p;
 	_backlight_en=true;
 	config();
-
 }
 
-void HT1621::begin(int cs_p,int wr_p,int data_p)
+void HT1621::begin(int cs_p, int wr_p, int data_p)
 {
 	pinMode(cs_p, OUTPUT);
 	pinMode(wr_p, OUTPUT);
@@ -77,8 +76,7 @@ void HT1621::wrDATA(unsigned char data, unsigned char cnt) {
 		if (data & 0x80) {
 			digitalWrite(_data_p, HIGH);
 		}
-		else
-		{
+		else {
 			digitalWrite(_data_p, LOW);
 		}
 		digitalWrite(_wr_p, HIGH);
@@ -115,24 +113,28 @@ void HT1621::wrone(unsigned char addr, unsigned char sdata)
 	wrDATA(sdata, 8);
 	digitalWrite(_cs_p, HIGH);
 }
+
 void HT1621::backlight()
 {
 	if (_backlight_en)
 		digitalWrite(_backlight_p, HIGH);
 	delay(1);
 }
+
 void HT1621::noBacklight()
 {
 	if(_backlight_en)
 		digitalWrite(_backlight_p, LOW);
 	delay(1);
 }
+
 void HT1621::wrCMD(unsigned char CMD) {  //100
 	digitalWrite(_cs_p, LOW);
 	wrDATA(0x80, 4);
 	wrDATA(CMD, 8);
 	digitalWrite(_cs_p, HIGH);
 }
+
 void HT1621::config()
 {
 	wrCMD(BIAS);
@@ -141,8 +143,8 @@ void HT1621::config()
 	wrCMD(WDTDIS1);
 	wrCMD(SYSEN);
 	wrCMD(LCDON);
-
 }
+
 void HT1621::wrCLR(unsigned char len) {
 	unsigned char addr = 0;
 	unsigned char i;
@@ -151,11 +153,12 @@ void HT1621::wrCLR(unsigned char len) {
 		addr = addr + 2;
 	}
 }
+
 void HT1621::setBatteryLevel(int level) {
 	// zero out the previous (otherwise the or couldn't be possible)
-		_buffer[0] &= 0x7F;
-		_buffer[1] &= 0x7F;
-		_buffer[2] &= 0x7F;
+	_buffer[0] &= 0x7F;
+	_buffer[1] &= 0x7F;
+	_buffer[2] &= 0x7F;
 
 	switch(level){
 		case 3: // battery on and all 3 segments
@@ -172,40 +175,36 @@ void HT1621::setBatteryLevel(int level) {
 	update();
 }
 
-
 void HT1621::clear(){
-
 	wrCLR(16);
-
 }
 
-void HT1621::update(){ // takes the buffer and puts it straight into the driver
-		// the buffer is backwards with respect to the lcd. could be improved
-		wrone(0, _buffer[5]);
-		wrone(2, _buffer[4]);
-		wrone(4, _buffer[3]);
-		wrone(6, _buffer[2]);
-		wrone(8, _buffer[1]);
-		wrone(10,_buffer[0]);
-
+// takes the buffer and puts it straight into the driver
+void HT1621::update(){
+	// the buffer is backwards with respect to the lcd. could be improved
+	wrone(0, _buffer[5]);
+	wrone(2, _buffer[4]);
+	wrone(4, _buffer[3]);
+	wrone(6, _buffer[2]);
+	wrone(8, _buffer[1]);
+	wrone(10,_buffer[0]);
 }
 
-
-void HT1621::print(long num, char*flags,int precision){
+void HT1621::print(long num, char*flags, int precision){
 	if(num > 999999) // basic checks
 		num = 999999; // clip into 999999
 	if(num < -99999) // basic checks
 		num = -99999; // clip into -99999
 
 	char localbuffer[7]; //buffer to work within the function
-	snprintf(localbuffer,7, flags, num); // convert the decimal into string
+	snprintf(localbuffer, 7, flags, num); // convert the decimal into string
 
 	// horrible handling but should get us working. needs refactor in next major
-  if(precision > 0 && num < pow(10, precision)) {
-    for(int i = 0; i<(5-precision); i++){
-      localbuffer[i] = ' ';
-    }
-  }
+	if (precision > 0 && num < pow(10, precision)) {
+		for (int i = 0; i < (5 - precision); i++) {
+			localbuffer[i] = ' ';
+		}
+	}
 
 	#ifdef HTDEBUG
 		Serial.print("\n\n");
@@ -259,12 +258,12 @@ void HT1621::print(long num, char*flags,int precision){
 
 }
 
-
 void HT1621::print(double num, int precision){
 	if(num > 999999) // basic checks
 		num = 999999; // clip into 999999
 	if(num < -99999) // basic checks
 		num = -99999; // clip into -99999
+
 	if(precision > 3 && num > 0)
 		precision = 3; // if positive max precision allowed = 3
 	else if(precision > 2 && num < 0)
@@ -281,18 +280,20 @@ void HT1621::print(double num, int precision){
 	long ingegerpart;
 	ingegerpart = ((long)(num*pow(10,precision)));
 
-	print(ingegerpart,flags,precision); // draw the integerized number
+	print(ingegerpart, flags, precision); // draw the integerized number
 	setdecimalseparator(precision); // draw the decimal point
 
+	update();
+}
 
 	update();
 }
 
 void HT1621::setdecimalseparator(int decimaldigits) {
-	 // zero out the eight bit
-		_buffer[3] &= 0x7F;
-		_buffer[4] &= 0x7F;
-		_buffer[5] &= 0x7F;
+	// zero out the eight bit
+	_buffer[3] &= 0x7F;
+	_buffer[4] &= 0x7F;
+	_buffer[5] &= 0x7F;
 
 	if( decimaldigits <= 0 || decimaldigits > 3){
 		return;
@@ -302,5 +303,6 @@ void HT1621::setdecimalseparator(int decimaldigits) {
 	// the first three eights bits in the buffer are for the battery signs
 	// the last three are for the decimal point
 	_buffer[6-decimaldigits] |= 0x80;
+}
 
 	}
