@@ -198,20 +198,25 @@ void HT1621::print(long num, char*flags, int precision){
 
 	char localbuffer[7]; //buffer to work within the function
 	snprintf(localbuffer, 7, flags, num); // convert the decimal into string
+	Serial.begin(9600);
+	Serial.print(localbuffer);
+	Serial.print("\t");
 
 	// horrible handling but should get us working. needs refactor in next major
-	if (precision > 0 && num < pow(10, precision)) {
+	if (precision > 0 && (num) < pow(10, precision)) {
+		// we remove extra leading zeros
 		for (int i = 0; i < (5 - precision); i++) {
-			localbuffer[i] = ' ';
-		}
+			Serial.print(localbuffer[1]);
+			if(localbuffer[i+1] == '0' && localbuffer[i] != '-'){ // we remove only if there is another zero ahead AND if it's not a minus sign
+				localbuffer[i] = ' ';
+			}
+			else{
+				break;
+			}
+			Serial.println();
+	}
 	}
 
-	#ifdef HTDEBUG
-		Serial.print("\n\n");
-		for(int jdbg = 0; jdbg < 6; jdbg++){
-			Serial.print(localbuffer[jdbg]);
-		}
-	#endif
 
 	for(int i=0; i<6; i++){
 		_buffer[i] &= 0x80; // mask the first bit, used by batter and decimal point
@@ -235,15 +240,48 @@ void HT1621::print(double num, int precision){
 
 	char * flags = "%6li";
 
-	if(precision > 0 && num < 1){
+	if(precision > 0 && abs(num) < 1){
 		flags = "%06li";
 	}
 
-	long ingegerpart;
-	ingegerpart = ((long)(num*pow(10,precision)));
+	long integerpart;
+	integerpart = ((long)(num*pow(10,precision)));
 
-	print(ingegerpart, flags, precision); // draw the integerized number
+	print(integerpart, flags, precision); // draw the integerized number
 	setdecimalseparator(precision); // draw the decimal point
+
+	update();
+}
+
+
+void HT1621::printCelsius(double num){
+	if(num > 9999) // basic checks
+		num = 9999; // clip into 999999
+	if(num < -999) // basic checks
+		num = -999; // clip into -99999
+
+	int precision;
+	
+	if(num <= -100 || num >= 999)
+		precision = 0;	// if negative max precision allowed = 0
+	else 
+		precision = 1;	// if positive max precision allowed = 1
+
+	char * flags = "%4li*C";
+
+	if(precision > 0 && abs(num) < 1){
+		flags = "%04li*C";
+	}
+
+	long integerpart;
+	integerpart = ((long)(num*pow(10,precision)));
+
+
+	print(integerpart, flags, precision); // draw the integerized number
+	if(precision > 0)
+		setdecimalseparator(precision+2); // draw the decimal point shifted by 2
+	else 	
+		setdecimalseparator(0); // or clear the decimal separator
 
 	update();
 }
@@ -311,61 +349,79 @@ char HT1621::charToSegBits(char character) {
 	case '9':
 		return 0b1111011;
 	case 'A':
+	case 'a':
 		return 0b1110111;
 	case 'b':
+	case 'B':
 		return 0b1001111;
 	case 'c':
-		return 0b0001110;
+	//	return 0b0001110;
 	case 'C':
 		return 0b0011101;
 	case 'd':
+	case 'D':
 		return 0b1101110;
 	case 'e':
-		return 0b0001110;
+	//	return 0b0001110;
 	case 'E':
 		return 0b0011111;
 	case 'f':
-		return 0b0000111;
+	//	return 0b0000111;
 	case 'F':
 		return 0b0010111;
 	case 'G':
-		return 0b1011111;
+	case 'g':
+		return 0b1011101;
 	case 'h':
-		return 0b1000111;
+	//	return 0b1000111;
 	case 'H':
 		return 0b1100111;
 	case 'i':
-		return 0b1000000;
+	//	return 0b1000000;
 	case 'I':
 		return 0b1100000;
 	case 'J':
+	case 'j':
 		return 0b1101000;
 	case 'l':
-		return 0b1100000;
+	//	return 0b1100000;
 	case 'L':
 		return 0b0001101;
+	case 'm':
 	case 'M':
-		return 0b1110101;
+		return 0b1010100;
 	case 'n':
+	case 'N':
 		return 0b1000110;
+	case 'O': // we can keep this for zero
+	//	return 0b1111101;
 	case 'o':
 		return 0b1001110;
-	case 'O':
-		return 0b1111101;
 	case 'P':
+	case 'p':
 		return 0b0110111;
+	case 'q':
+	case 'Q':
+		return 0b1110011;
 	case 'r':
+	case 'R':
 		return 0b0000110;
 	case 'S':
+	case 's':
 		return 0b1011011;
 	case 't':
+	case 'T':
 		return 0b0001111;
 	case 'u':
-		return 0b1001100;
+	//	return 0b1001100;
 	case 'U':
 		return 0b1101101;
 	case 'Y':
+	case 'y':
 		return 0b1101011;
+	case 'z':
+	case 'Z':
+		return 0b0111110;
 	case ' ':
 	default:
 		return 0b0000000;

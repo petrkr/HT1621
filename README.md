@@ -26,11 +26,17 @@ Accepts values from 0 to 3. Smaller values will be treated like 0, bigger values
 * `void print(long num)`  
 Prints a signed integer between -99999 and 999999. Larger and smaller values will be displayed as -99999 and 999999
 
+* `void printCelsius(float num)`  
+Prints a signed temperature between -999 and 9999 and appends the degree symbol. Larger and smaller values will be displayed as -999 and 9999. The precision is limited to 1 digit due to the fact that there is no dot on the left part of the display (it's used for the battery). 
+
 * `void print(float num)`  
 Prints a float with 3 decimals. 
 
 * `void print(float num, int precision)`  
 Prints a float with 0 to 3 decimals, based on the `precision` parameter. 
+
+* `void print(char* str, bool leftPadded = false)`
+Prints a string. If `leftPadded` is true, the string will be left padded with spaces to fit the display. Not all characters are supported, only the ones that can be displayed on the display. Higher and lower case characters are ignored and the one that is the most clear between the two is used. Currenly not supporting: 'k' (unprintable???), 'v', 'w'. 'm' is printed in a funny way but looks like it's common notation. Symbols available: 	'°' (must use '*' but prints °), '|', '-', '_'. 
 
 * `void noDisplay()`  
 Turns off the display (doesn't turn off the backlight) 
@@ -45,13 +51,13 @@ Turns the display back on after it has been disabled by `noDisplay()`
 C -> 0x1D = 10 + 01 + 04 + 08
 
 ```
-  ___10___
- |        |
- 01       20
- |___02___|
- |        |
- 04       40
- |___08___|
+  _0b1 0000_
+ |          |
+ 0b1        0b10 0000
+ |___0b10___|
+ |          |
+ 0b0100     0b0100 0000
+ |__00b1000_|
 
 ```
 
