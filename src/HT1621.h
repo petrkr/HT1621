@@ -57,10 +57,10 @@ public:
 	void backlight();
 	void noBacklight();
 	void setBatteryLevel(int level);
-	void print(long num, char* flags="%6li", int precision = 0);
+	void print(long num, const char* flags="%6li", int precision = 0);
 	void print(double num, int precision = 3);
 	void printCelsius(double num); // precision is always 1
-	void print(char* str, bool leftPadded = false);
+	void print(const char* str, bool leftPadded = false);
 	void display();
 	void noDisplay();
 private:

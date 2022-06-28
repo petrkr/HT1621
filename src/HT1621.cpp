@@ -190,7 +190,7 @@ void HT1621::update(){
 	wrone(10,_buffer[0]);
 }
 
-void HT1621::print(long num, char*flags, int precision){
+void HT1621::print(long num, const char* flags, int precision){
 	if(num > 999999) // basic checks
 		num = 999999; // clip into 999999
 	if(num < -99999) // basic checks
@@ -238,11 +238,7 @@ void HT1621::print(double num, int precision){
 	if(precision < 0)
 		precision = 0; // negative precision?!
 
-	char * flags = "%6li";
-
-	if(precision > 0 && abs(num) < 1){
-		flags = "%06li";
-	}
+	const char* flags = (precision > 0 && abs(num) < 1) ? "%06li" : "%6li";
 
 	long integerpart;
 	integerpart = ((long)(num*pow(10,precision)));
@@ -267,11 +263,7 @@ void HT1621::printCelsius(double num){
 	else 
 		precision = 1;	// if positive max precision allowed = 1
 
-	char * flags = "%4li*C";
-
-	if(precision > 0 && abs(num) < 1){
-		flags = "%04li*C";
-	}
+	const char* flags = (precision > 0 && abs(num) < 1) ? "%04li*C" : "%4li*C";
 
 	long integerpart;
 	integerpart = ((long)(num*pow(10,precision)));
@@ -286,7 +278,7 @@ void HT1621::printCelsius(double num){
 	update();
 }
 
-void HT1621::print(char* str, bool leftPadded){
+void HT1621::print(const char* str, bool leftPadded){
 	int chars = strlen(str);
 	int padding = 6 - chars;
 
