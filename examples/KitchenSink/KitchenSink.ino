@@ -4,6 +4,8 @@
 #define LCD_DATA_PIN 8
 #define DELAY_SINK 1000
 
+// #define _HTDEBUG
+
 HT1621 lcd;
 void setup() {
   lcd.begin(LCD_CS_PIN, LCD_WR_PIN, LCD_DATA_PIN);
