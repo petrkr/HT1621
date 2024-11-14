@@ -56,14 +56,14 @@ public:
 	void clear();
 	void backlight();
 	void noBacklight();
-	void setBatteryLevel(int level);
+	virtual void setBatteryLevel(int level);
 	void print(long num, const char* flags="%6li", int precision = 0);
 	void print(double num, int precision = 3);
-	void printCelsius(double num); // precision is always 1
+	virtual void printCelsius(double num); // precision is always 1
 	void print(const char* str, bool leftPadded = false);
 	void display();
 	void noDisplay();
-private:
+protected:
 	int _cs_p;
 	int _wr_p;
 	int _data_p;
@@ -78,7 +78,7 @@ private:
 	void wrCMD(unsigned char CMD);
 	void setdecimalseparator(int dpposition);
 	void config(); // legacy: why not in begin func
-	void update();
-	char charToSegBits(char character);
+	virtual void update();
+	virtual char charToSegBits(char character);
 };
 #endif
